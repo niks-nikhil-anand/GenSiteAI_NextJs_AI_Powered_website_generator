@@ -1,16 +1,19 @@
 import React from 'react'
 import { Button } from '../ui/button'
+import { COLORS } from '../../constants/colors' // Import COLORS
 
 const Navbar = () => {
   return (
-    <div>
-        <div>
-            <h1>WebGenie</h1>
-        </div>
-        <div>
-            <Button>SignIn</Button>
-            <Button>Get Started</Button>
-        </div>
+    <div className='flex justify-between py-4 px-7'>
+      <div>
+        <h1 className='text-lg font-bold font-serif'>WebGenie</h1>
+      </div>
+      <div className='flex gap-4'>
+        <Button>Sign In</Button>
+        <Button className='text-white' style={{ backgroundColor: COLORS.primaryBlue}}>
+          Get Started
+        </Button>
+      </div>
     </div>
   )
 }
