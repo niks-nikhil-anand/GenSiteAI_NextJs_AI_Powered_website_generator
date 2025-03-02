@@ -3,7 +3,7 @@ import React from 'react'
 
 const page = () => {
   return (
-    <div>
+    <div className='h-[89vh] w-full bg-white '>
             
     </div>
   )
