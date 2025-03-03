@@ -6,7 +6,7 @@ const Navbar = () => {
   return (
     <div className='flex justify-between py-4 px-7'>
       <div>
-        <h1 className='text-lg font-bold font-serif'>WebGenie</h1>
+        <h1 className='text-lg font-bold font-serif hover:underline cursor-pointer'>WebGenie</h1>
       </div>
       <div className='flex gap-4'>
         <Button className='cursor-pointer'>Sign In</Button>
@@ -15,7 +15,7 @@ const Navbar = () => {
         </Button>
       </div>
     </div>
-  )
+  ) 
 }
 
 export default Navbar
