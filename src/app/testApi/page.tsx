@@ -21,7 +21,6 @@ export default function Test() {
       <h1 className="text-2xl font-bold">Test OpenAI API</h1>
       <textarea
         className="border p-2 w-full my-2"
-        rows="4"
         placeholder="Type your message..."
         value={message}
         onChange={(e) => setMessage(e.target.value)}
