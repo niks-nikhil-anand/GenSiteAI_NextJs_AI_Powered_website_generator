@@ -9,8 +9,8 @@ const Navbar = () => {
         <h1 className='text-lg font-bold font-serif'>WebGenie</h1>
       </div>
       <div className='flex gap-4'>
-        <Button>Sign In</Button>
-        <Button className='text-white' style={{ backgroundColor: COLORS.primaryBlue}}>
+        <Button className='cursor-pointer'>Sign In</Button>
+        <Button className='text-white cursor-pointer' style={{ backgroundColor: COLORS.primaryBlue}}>
           Get Started
         </Button>
       </div>
