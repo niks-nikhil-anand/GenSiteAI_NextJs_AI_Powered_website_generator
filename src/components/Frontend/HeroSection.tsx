@@ -19,7 +19,7 @@ const HeroSection = () => {
             className="outline-none w-full h-full resize-none"
             onChange={(event) => setUserInput(event.target.value)}
         />
-        {userInput && <FaArrowRight className="ml-4 text-blue-600 h-5 cursor-pointer" />}
+        {userInput && <FaArrowRight className="ml-4 text-blue-600 h-7 w-5 cursor-pointer" />}
     </div>
 </div>
     </div>
