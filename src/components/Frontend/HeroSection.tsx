@@ -1,9 +1,11 @@
+"use client"
 import { Lookup } from '@/constants/lookup'
-import React from 'react'
+import React, { useState } from 'react'
 import { FaArrowRight } from "react-icons/fa6";
 
 
 const HeroSection = () => {
+    const [userInput , setUserInput] = useState<string>('');
   return (
     <div className='h-[89vh] w-full bg-white flex justify-center items-center flex-col '>
         <div className='flex flex-col gap-4 justify-center items-center py-4'>
@@ -15,8 +17,9 @@ const HeroSection = () => {
         <textarea 
             placeholder={Lookup.INPUT_PLACEHOLDER} 
             className="outline-none w-full h-full resize-none"
+            onChange={(event) => setUserInput(event.target.value)}
         />
-        <FaArrowRight className="ml-4 text-blue-400" />
+        {userInput && <FaArrowRight className="ml-4 text-blue-600 h-5 cursor-pointer" />}
     </div>
 </div>
     </div>
