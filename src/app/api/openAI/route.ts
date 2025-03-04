@@ -9,7 +9,7 @@ export async function POST(req:Request) {
     console.log("Parsed request body:", message);
 
     const client = new OpenAI({
-      baseURL: "https://models.inference.ai.azure.com",
+      baseURL: process.env.BASE_URL,
       apiKey: process.env.OPEN_AI_API_KEYS,
     });
 
