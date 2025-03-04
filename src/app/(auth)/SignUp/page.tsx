@@ -1,110 +1,107 @@
-"use client"
-import React, { useState } from 'react'
-import Image from 'next/image'
-import github from '../../../../public/auth/githubLogo.png'
-import google from '../../../../public/auth/googleLogo.png'
+"use client";
+
+import { useState } from "react";
+import { useSignUp } from "@clerk/nextjs";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import Image from "next/image";
+import googleIcon from "../../../../public/auth/googleLogo.png";
+import githubIcon from "../../../../public/auth/githubLogo.png";
 
 const SignUp = () => {
+    const { signUp, isLoaded } = useSignUp();
     const [formData, setFormData] = useState({
-        fullName: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
+        email: "",
+        password: "",
     });
 
-    const handleChange = (e) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (formData.password !== formData.confirmPassword) {
-            alert("Passwords do not match!");
-            return;
+        if (!isLoaded) return;
+
+        try {
+            await signUp.create({
+                emailAddress: formData.email,
+                password: formData.password,
+            });
+
+            await signUp.prepareEmailAddressVerification();
+            alert("Check your email for verification!");
+        } catch (error: any) {
+            console.error("Sign-up error:", error.errors);
         }
-        console.log("Form submitted:", formData);
     };
 
-    const handleProviderSignIn = async (provider) => {
+    const handleProviderSignIn = async (provider: "oauth_google" | "oauth_github") => {
+        if (!isLoaded) return;
+
         try {
-            const result = await signIn(provider);
-            if (result?.error) throw new Error(result.error);
-            console.log("User signed in successfully:", result);
-        } catch (error) {
-            console.error("Error during sign-in:", error.message);
+            await signUp.authenticateWithRedirect({
+                strategy: provider,
+                redirectUrl: "/dashboard",
+                redirectUrlComplete: "/dashboard",
+            });
+        } catch (error: any) {
+            console.error("OAuth sign-in error:", error.errors);
         }
     };
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
-            <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow">
-                <h1 className="text-2xl font-bold text-center">Create Your Account</h1>
-                <p className="text-center text-gray-600">Sign up to get started</p>
-                
-                <form className="space-y-4" onSubmit={handleSubmit}>
-                    <input
-                        type="text"
-                        name="fullName"
-                        placeholder="Full Name"
-                        value={formData.fullName}
-                        onChange={handleChange}
-                        required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    <input
-                        type="email"
-                        name="email"
-                        placeholder="Email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="Password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    <input
-                        type="password"
-                        name="confirmPassword"
-                        placeholder="Confirm Password"
-                        value={formData.confirmPassword}
-                        onChange={handleChange}
-                        required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    <button
-                        type="submit"
-                        className="w-full py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700"
-                    >
-                        Sign Up
-                    </button>
-                </form>
+            <Card className="w-full max-w-md p-6">
+                <CardHeader>
+                    <CardTitle className="text-center text-2xl">Create Your Account</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <Input
+                            type="email"
+                            name="email"
+                            placeholder="Email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            required
+                        />
+                        <Input
+                            type="password"
+                            name="password"
+                            placeholder="Password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            required
+                        />
+                        <Button type="submit" className="w-full">
+                            Sign Up
+                        </Button>
+                    </form>
 
-                {/* Social login buttons */}
-                <div className="flex flex-col sm:flex-row sm:justify-around gap-4">
-                    <button
-                        onClick={() => handleProviderSignIn("google")}
-                        className="flex items-center justify-center gap-3 px-5 py-3 w-full sm:w-auto border border-gray-300 rounded-full shadow-md bg-white hover:bg-gray-100 transition-all"
-                    >
-                        <Image src={google} alt="Google Icon" width={28} height={28} />
-                        <span className="text-gray-700 font-semibold">Sign up with Google</span>
-                    </button>
+                    {/* Social Sign-In Buttons */}
+                    <div className="mt-4 flex flex-col gap-3">
+                        <Button
+                            onClick={() => handleProviderSignIn("oauth_google")}
+                            variant="outline"
+                            className="flex items-center gap-3 justify-center"
+                        >
+                            <Image src={googleIcon} alt="Google" width={20} height={20} />
+                            Sign up with Google
+                        </Button>
 
-                    <button
-                        onClick={() => handleProviderSignIn("github")}
-                        className="flex items-center justify-center gap-3 px-5 py-3 w-full sm:w-auto border border-gray-300 rounded-full shadow-md bg-white text-black hover:bg-gray-100 transition-all"
-                    >
-                        <Image src={github} alt="GitHub Icon" width={28} height={28} />
-                        <span className="font-semibold">Sign up with GitHub</span>
-                    </button>
-                </div>
-            </div>
+                        <Button
+                            onClick={() => handleProviderSignIn("oauth_github")}
+                            variant="outline"
+                            className="flex items-center gap-3 justify-center"
+                        >
+                            <Image src={githubIcon} alt="GitHub" width={20} height={20} />
+                            Sign up with GitHub
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
         </div>
     );
 };
