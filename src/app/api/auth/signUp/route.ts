@@ -1,3 +1,5 @@
+import { User } from "@/app/models/UserModels";
+import connectDB from "@/lib/connectDB";
 import { NextRequest, NextResponse } from "next/server";
 
 
