@@ -3,11 +3,11 @@ import React from 'react'
 import { Button } from '../ui/button'
 import { COLORS } from '../../constants/colors'
 import Link from 'next/link'
-import { useAuth, useClerk } from '@clerk/nextjs'
+import { useAuth, useClerk, UserButton } from '@clerk/nextjs'
+
 
 const Navbar = () => {
   const { userId } = useAuth();
-  const { signOut } = useClerk()
   return (
     <div className='flex justify-between py-4 px-7 bg-gray-100'>
       <div>
@@ -29,15 +29,7 @@ const Navbar = () => {
           </>
         ) : (
           <>
-            <Link href={"/profile"}>
-              <Button className='cursor-pointer'>Profile</Button>
-            </Link>
-            <Button
-              className="bg-red-500 text-white cursor-pointer hover:bg-red-600"
-              onClick={() => signOut()}
-            >
-              Logout
-            </Button>
+            <UserButton/>
           </>
         )}
 
