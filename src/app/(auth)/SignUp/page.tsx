@@ -30,7 +30,6 @@ const SignUp = () => {
             });
 
             await signUp.prepareEmailAddressVerification();
-            alert("Check your email for verification!");
         } catch (error: any) {
             console.error("Sign-up error:", error.errors);
         }
