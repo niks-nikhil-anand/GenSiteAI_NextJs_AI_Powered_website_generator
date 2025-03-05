@@ -12,10 +12,10 @@ const Navbar = () => {
         </Link>
       </div>
       <div className='flex gap-4'>
-        <Link href={"/SignIn"}>
+        <Link href={"/sign-in"}>
         <Button className='cursor-pointer'>Sign In</Button>
         </Link>
-        <Link href={"/SignUp"}>
+        <Link href={"/sign-up"}>
         <Button className='text-white cursor-pointer' style={{ backgroundColor: COLORS.primaryBlue}}>
           Get Started
         </Button>

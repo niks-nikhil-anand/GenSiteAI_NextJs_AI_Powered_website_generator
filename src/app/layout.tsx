@@ -43,7 +43,9 @@ export default function RootLayout({
           </ClerkLoading>
           <ClerkLoaded>
             <Navbar />
+            <div className="min-h-[90vh]">
             {children}
+            </div>
             <Footer />
           </ClerkLoaded>
         </body>
