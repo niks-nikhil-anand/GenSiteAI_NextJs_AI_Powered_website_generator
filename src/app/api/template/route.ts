@@ -23,7 +23,7 @@ export async function POST(req: Request) {
 
     const client = new OpenAI({
       baseURL: "https://models.inference.ai.azure.com",
-      apiKey: process.env.OPEN_AI_API_KEYS,
+      apiKey: process.env.OPENAI_API_KEY,
     });
 
     console.log("OpenAI client initialized");
