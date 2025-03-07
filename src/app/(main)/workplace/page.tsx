@@ -204,52 +204,67 @@ const Workplace = () => {
   };
 
   return (
-    <div className="p-10">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="max-h-[55vh] overflow-scroll">
-          <StepsList steps={steps} currentStep={currentStep ?? 0} onStepClick={setCurrentStep} />
-        </div>
-        <div className="md:col-span-2">
-          <div className="flex flex-col gap-4">
-            {(loading || !templateSet) && <Loading />}
-            {!(loading || !templateSet) && (
-              <div className="flex gap-2">
-                <textarea
-                  value={userPrompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  className="p-2 w-full border border-black rounded-lg"
-                  placeholder="Enter your prompt..."
-                />
-                <button
-                  onClick={handleSendPrompt}
-                  className="bg-purple-400 px-4 py-2 rounded-lg text-white hover:bg-purple-500"
-                >
-                  Send
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-        <div className="col-span-1">
-          <FileExplorer
-            files={files}
-            onFileSelect={setSelectedFile}
-          />
-        </div>
-        <div className="col-span-2 bg-gray-900 rounded-lg shadow-lg p-4 h-[calc(100vh-8rem)]">
-          <TabView activeTab={activeTab} onTabChange={setActiveTab} />
-          <div className="h-[calc(100%-4rem)]">
-            {activeTab === 'code' ? (
-              <CodeEditor file={selectedFile} />
-            ) : (
-              <CodeView />
-            )}
-          </div>
-        </div>
+    <div className="p-6">
+  {/* Grid layout for StepsList, FileExplorer, and CodeEditor */}
+  <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+    {/* StepsList - 25% width */}
+    <div className="col-span-1 max-h-[55vh] overflow-y-scroll border border-gray-200 rounded-lg shadow-sm p-4">
+      <StepsList steps={steps} currentStep={currentStep ?? 0} onStepClick={setCurrentStep} />
+    </div>
+
+    {/* FileExplorer - 25% width with fixed height and scrollbar */}
+    <div className="col-span-1 h-[55vh] overflow-y-scroll border border-gray-200 rounded-lg shadow-sm p-4">
+      <FileExplorer
+        files={files}
+        onFileSelect={setSelectedFile}
+      />
+    </div>
+
+    {/* CodeEditor - 50% width with fixed height and scrollbar */}
+    <div className="col-span-2 h-[55vh] bg-gray-900 rounded-lg shadow-lg p-4 overflow-y-scroll">
+      <TabView activeTab={activeTab} onTabChange={setActiveTab} />
+      <div className="h-[calc(100%-4rem)] mt-4">
+        {activeTab === 'code' ? (
+          <CodeEditor file={selectedFile} />
+        ) : (
+          <CodeView />
+        )}
       </div>
     </div>
+  </div>
+
+  {/* Input Field - Below StepsList and FileExplorer */}
+  <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
+    {/* Empty space to align with StepsList */}
+    <div className="col-span-1"></div>
+
+    {/* Input Field - 50% width (spanning 2 columns) */}
+    <div className="col-span-2">
+      <div className="flex flex-col gap-4">
+        {(loading || !templateSet) && <Loading />}
+        {!(loading || !templateSet) && (
+          <div className="flex flex-col gap-2">
+            <textarea
+              value={userPrompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              className="p-2 w-full border border-gray-300 rounded-lg focus:border-purple-400 focus:ring-1 focus:ring-purple-400"
+              placeholder="Enter your prompt..."
+            />
+            <button
+              onClick={handleSendPrompt}
+              className="bg-purple-400 px-4 py-2 rounded-lg text-white hover:bg-purple-500 transition-colors duration-200"
+            >
+              Send
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+
+    {/* Empty space to align with CodeEditor */}
+    <div className="col-span-1"></div>
+  </div>
+</div>
   );
 };
 
