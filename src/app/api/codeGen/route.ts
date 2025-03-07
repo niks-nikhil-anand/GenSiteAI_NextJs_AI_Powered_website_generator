@@ -50,6 +50,7 @@ export async function POST(req: Request) {
     }
 
     console.log("AI response generated successfully");
+    console.log(aiResponse)
 
     // Return the AI's response
     return NextResponse.json({ response: aiResponse }, { status: 200 });

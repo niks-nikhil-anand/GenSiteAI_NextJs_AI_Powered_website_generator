@@ -67,20 +67,23 @@ const Workplace = () => {
           headers: { "Content-type": "application/json" },
           body: JSON.stringify({ prompts }),
         });
-        
 
         if (!stepsResponse.ok) {
           console.error("CodeGen API failed");
-          setLoading(false); 
+          setLoading(false); // Ensure loading is reset on error
           return;
         }
 
         const stepsData = await stepsResponse.json();
-        console.log(stepsData)
+        console.log(stepsData); // Log the response for debugging
+
+        // Parse the response into additional steps
         const additionalSteps = parseXml(stepsData.response).map((x: Step) => ({
           ...x,
           status: "pending" as const, // Ensure status is a literal type
         }));
+
+        // Merge additional steps with the existing steps
         setSteps((prevSteps) => [...prevSteps, ...additionalSteps]);
 
         // Update LLM messages
@@ -153,14 +156,14 @@ const Workplace = () => {
           }
           originalFiles = finalAnswerRef;
         }
-        return { ...step, status: "completed" as const }; // Ensure status is a literal type
+        return { ...step, status: "completed" as const }; // Mark step as completed
       }
       return step;
     });
 
     if (updateHappened) {
-      setFiles(originalFiles);
-      setSteps(updatedSteps);
+      setFiles(originalFiles); // Update the file structure
+      setSteps(updatedSteps); // Update the steps
     }
   }, [steps, files]);
 
@@ -241,7 +244,7 @@ const Workplace = () => {
             {activeTab === 'code' ? (
               <CodeEditor file={selectedFile} />
             ) : (
-              <CodeView  />
+              <CodeView />
             )}
           </div>
         </div>
