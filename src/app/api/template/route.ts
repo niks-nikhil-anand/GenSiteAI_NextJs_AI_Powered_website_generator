@@ -8,11 +8,13 @@ export async function POST(req: Request) {
   try {
     console.log("Received a request");
 
-    const { message } = await req.json();
-    console.log("Parsed request body:", message);
+    const { message, userInput } = await req.json(); // Accept both message and userInput
+    const input = message || userInput; // Use message if available, otherwise fallback to userInput
 
-    if (!message || typeof message !== "string") {
-      console.error("Invalid message format:", message);
+    console.log("Parsed request body:", { message, userInput, input });
+
+    if (!input || typeof input !== "string") {
+      console.error("Invalid input format:", input);
       return NextResponse.json(
         { error: "Invalid request format" },
         { status: 400 }
@@ -30,7 +32,7 @@ export async function POST(req: Request) {
       model: "gpt-4o",
       messages: [
         { role: "system", content: "You are an AI assistant." },
-        { role: "user", content: message },
+        { role: "user", content: input }, // Use the parsed input
         {
           role: "system",
           content:
