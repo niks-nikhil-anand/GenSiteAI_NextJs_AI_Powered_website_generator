@@ -1,59 +1,47 @@
-import OpenAI from "openai";
 import { NextResponse } from "next/server";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getSystemPrompt } from "../../../utils/prompt";
 
 export async function POST(req: Request) {
   try {
     console.log("Received a request at /codeGen");
 
-    // Parse the request body to extract `prompts` (or `messages`)
     const { prompts } = await req.json();
 
-    // Check if prompts is provided and is an array
     if (!Array.isArray(prompts)) {
       console.error("Invalid or missing prompts in request");
-      return NextResponse.json(
-        { error: "Invalid or missing prompts" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid or missing prompts" }, { status: 400 });
     }
 
-    // Initialize the OpenAI client
-    const client = new OpenAI({
-        baseURL: "https://models.inference.ai.azure.com",
-        apiKey: process.env.OPENAI_API_KEY, // Ensure the environment variable is correctly named
-    });
+    const apiKey = process.env.GEMINI_API_KEY;
 
-    console.log("OpenAI client initialized");
-
-    // Generate a response using the OpenAI API
-    const response = await client.chat.completions.create({
-      model: "gpt-4o", // Use the correct model name
-      messages: [
-        { role: "system", content: getSystemPrompt() }, // Use the system prompt
-        { role: "user", content: prompts.join("\n") }, // Combine prompts into a single message
-      ],
-      temperature: 1,
-      max_tokens: 100,
-      top_p: 1,
-    });
-
-    // Extract the AI's response
-    const aiResponse = response.choices[0]?.message?.content;
-
-    if (!aiResponse) {
-      console.error("Invalid response from AI");
-      return NextResponse.json(
-        { error: "Invalid response from AI" },
-        { status: 400 }
-      );
+    if (!apiKey) {
+      console.error("Missing Gemini API key");
+      return NextResponse.json({ error: "Missing Gemini API key" }, { status: 500 });
     }
 
-    console.log("AI response generated successfully");
-    console.log(aiResponse)
+    const genAI = new GoogleGenerativeAI(apiKey);
 
-    // Return the AI's response
-    return NextResponse.json({ response: aiResponse }, { status: 200 });
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash", // Recommended model as of now
+    });
+
+    // Merge system and user prompts
+    const fullPrompt = [getSystemPrompt(), ...prompts].join("\n");
+
+    const result = await model.generateContent(fullPrompt);
+
+    const text = result.response.text();
+
+    if (!text) {
+      console.error("No response from Gemini");
+      return NextResponse.json({ error: "No response from Gemini" }, { status: 500 });
+    }
+
+    console.log("Gemini response generated successfully");
+    console.log(text);
+
+    return NextResponse.json({ response: text }, { status: 200 });
   } catch (error: any) {
     console.error("Error occurred in /codeGen:", error);
     return NextResponse.json(

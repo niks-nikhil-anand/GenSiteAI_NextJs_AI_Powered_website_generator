@@ -1,90 +1,51 @@
-import OpenAI from "openai";
-import { NextResponse } from "next/server";
-import { basePrompt as nodeBasePrompt } from "../../../utils/default/node";
-import { basePrompt as reactBasePrompt } from "../../../utils/default/react";
-import { BASE_PROMPT, getSystemPrompt } from "../../../utils/prompt";
+import { NextRequest, NextResponse } from "next/server";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-export async function POST(req: Request) {
+// Initialize Gemini client
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+
+export async function POST(req: NextRequest) {
   try {
-    console.log("Received a request");
+    const { message, userInput } = await req.json();
+    const input = message || userInput;
 
-    const { message, userInput } = await req.json(); // Accept both message and userInput
-    const input = message || userInput; // Use message if available, otherwise fallback to userInput
-
-    console.log("Parsed request body:", { message, userInput, input });
+    console.log("Received input:", input);
 
     if (!input || typeof input !== "string") {
-      console.error("Invalid input format:", input);
-      return NextResponse.json(
-        { error: "Invalid request format" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid request format" }, { status: 400 });
     }
 
-    const client = new OpenAI({
-      baseURL: "https://models.inference.ai.azure.com",
-      apiKey: process.env.OPENAI_API_KEY,
-    });
+    const prompt = `${input}\n\nReturn either 'node' or 'react' based on what you think this project should be. Only return a single word: either 'node' or 'react'. Do not return anything extra.`;
 
-    console.log("OpenAI client initialized");
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const response = await client.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        { role: "system", content: "You are an AI assistant." },
-        { role: "user", content: input }, // Use the parsed input
-        {
-          role: "system",
-          content:
-            "Return either 'node' or 'react' based on what you think this project should be. Only return a single word: either 'node' or 'react'. Do not return anything extra.",
-        },
-      ],
-      temperature: 1,
-      max_tokens: 100,
-      top_p: 1,
-    });
+    const result = await model.generateContent(prompt);
+    const text = result.response.text().trim().toLowerCase();
 
-    console.log("OpenAI response received:", response);
+    console.log("Gemini response:", text);
 
-    if (!response || !response.choices || response.choices.length === 0) {
-      console.error("Invalid response from OpenAI:", response);
-      return NextResponse.json(
-        { error: "Invalid response from AI" },
-        { status: 400 }
-      );
-    }
-
-    const answer = response.choices[0]?.message?.content?.trim().toLowerCase();
-    console.log("Parsed AI response:", answer);
-
-    if (answer === "react") {
-      console.log("Detected React project");
+    if (text === "react") {
       return NextResponse.json({
         prompts: [
-          BASE_PROMPT,
-          `Here is an artifact that contains all files of the project visible to you.\nConsider the contents of ALL files in the project.\n\n${reactBasePrompt}\n\nHere is a list of files that exist on the file system but are not being shown to you:\n\n  - .gitignore\n  - package-lock.json\n`,
+          "BASE_PROMPT",
+          `Here is an artifact that contains all files of the project visible to you.\nConsider the contents of ALL files in the project.\n\nreactBasePrompt\n\nHere is a list of files that exist on the file system but are not being shown to you:\n\n  - .gitignore\n  - package-lock.json\n`,
         ],
-        uiPrompts: [reactBasePrompt],
+        uiPrompts: ["reactBasePrompt"],
       });
     }
 
-    if (answer === "node") {
-      console.log("Detected Node.js project");
+    if (text === "node") {
       return NextResponse.json({
         prompts: [
-          `Here is an artifact that contains all files of the project visible to you.\nConsider the contents of ALL files in the project.\n\n${nodeBasePrompt}\n\nHere is a list of files that exist on the file system but are not being shown to you:\n\n  - .gitignore\n  - package-lock.json\n`,
+          `Here is an artifact that contains all files of the project visible to you.\nConsider the contents of ALL files in the project.\n\nnodeBasePrompt\n\nHere is a list of files that exist on the file system but are not being shown to you:\n\n  - .gitignore\n  - package-lock.json\n`,
         ],
-        uiPrompts: [nodeBasePrompt],
+        uiPrompts: ["nodeBasePrompt"],
       });
     }
 
-    console.warn("Unexpected AI response:", answer);
-    return NextResponse.json(
-      { error: "Invalid response from AI" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid response from Gemini" }, { status: 400 });
   } catch (error: any) {
-    console.error("Error occurred:", error);
+    console.error("Unexpected error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
