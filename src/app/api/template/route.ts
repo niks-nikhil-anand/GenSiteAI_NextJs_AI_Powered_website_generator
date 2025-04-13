@@ -20,26 +20,33 @@ export async function POST(req: NextRequest) {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const result = await model.generateContent(prompt);
-    const text = result.response.text().trim().toLowerCase();
 
-    console.log("Gemini response:", text);
+    const rawText = result.response.text();
+    console.log("Raw Gemini response:", rawText);
+
+    const text = rawText.trim().toLowerCase();
+    console.log("Parsed Gemini response:", text);
 
     if (text === "react") {
+      const uiPrompts = ["reactBasePrompt", input];
+      console.log("UI Prompts:", uiPrompts);
       return NextResponse.json({
         prompts: [
           "BASE_PROMPT",
           `Here is an artifact that contains all files of the project visible to you.\nConsider the contents of ALL files in the project.\n\nreactBasePrompt\n\nHere is a list of files that exist on the file system but are not being shown to you:\n\n  - .gitignore\n  - package-lock.json\n`,
         ],
-        uiPrompts: ["reactBasePrompt"],
+        uiPrompts,
       });
     }
 
     if (text === "node") {
+      const uiPrompts = ["nodeBasePrompt", input];
+      console.log("UI Prompts:", uiPrompts);
       return NextResponse.json({
         prompts: [
           `Here is an artifact that contains all files of the project visible to you.\nConsider the contents of ALL files in the project.\n\nnodeBasePrompt\n\nHere is a list of files that exist on the file system but are not being shown to you:\n\n  - .gitignore\n  - package-lock.json\n`,
         ],
-        uiPrompts: ["nodeBasePrompt"],
+        uiPrompts,
       });
     }
 
